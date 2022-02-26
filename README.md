@@ -46,11 +46,11 @@ $ systemctl --user daemon-reload
 
 #### 1.3) The *proto* definition
 
-The annotating components can be summaried in [protobuf](https://developers.google.com/protocol-buffers/docs/overview):
+The neutral language processing data can be summaried in [protobuf](https://developers.google.com/protocol-buffers/docs/overview):
 
 https://github.com/stanfordnlp/CoreNLP/blob/main/src/edu/stanford/nlp/pipeline/CoreNLP.proto
 
-The auto-generated GO packge is named as [github.com/genelet/coreNLP/nlp](github.com/genelet/coreNLP/nlp).
+The auto-generated GO packge is named as [github.com/genelet/coreNLP/nlp](https://github.com/genelet/coreNLP/nlp).
 
 <br /><br />
 
