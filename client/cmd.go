@@ -12,7 +12,7 @@ import (
 	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
-// Cmd runs Stanford CoreNLP process under command line.
+// Cmd runs Stanford CoreNLP under command line.
 // The original Java-based CoreNLP package must be downloaded
 // and installed properly.
 //
@@ -35,15 +35,20 @@ type Cmd struct {
 	Args        []string
 }
 
-// NewCmd creates an instance of Cmd
-// annotators: the list of annotators.
-// args[0], optional: the Java Classpath
-// args[1], optional: the Java class
-// args[2], optional: the Java command
-// args[3:], optional: other arguments
+// NewCmd creates an instance of Cmd.
 //
-// e.g. if the CoreNLP is downloaded and unzipped to /home/user/standford
-// you can create an instance:
+// annotators: the list of annotators;
+//
+// args[0], optional: the Java Classpath;
+//
+// args[1], optional: the Java class;
+//
+// args[2], optional: the Java command;
+//
+// args[3:], optional: other arguments.
+//
+// For example, if the CoreNLP is downloaded and unzipped to /home/user/standford,
+// you can create instance:
 // NewCmd([]string{"tokenize","ssplit","pos"}, "/home/user/standford/*")
 //
 // see
@@ -69,11 +74,9 @@ func NewCmd(annotators []string, args ...string) *Cmd {
 	return &Cmd{annotators, cp, c, java, args}
 }
 
-// Run on the input file, and get the parsed document in msg
+// Runs on the input file, and gets the NLP data in msg.
 //
-// Document is the root component in the auto-generated protobuf GO package
-// from the protobuf definition file
-// https://github.com/stanfordnlp/CoreNLP/blob/main/src/edu/stanford/nlp/pipeline/CoreNLP.proto
+// Note that Document{} is the root component in the auto-generated NLP protobuf package.
 // 
 func (self *Cmd) Run(ctx context.Context, input string, msg protoreflect.ProtoMessage) error {
 	data, err := ioutil.ReadFile(input)
@@ -83,7 +86,7 @@ func (self *Cmd) Run(ctx context.Context, input string, msg protoreflect.ProtoMe
 	return self.RunText(ctx, data, msg)
 }
 
-// RunText on the text string, and get the parsed document in msg
+// RunText runs on the text string, and gets the NLP data in msg
 //
 func (self *Cmd) RunText(ctx context.Context, text []byte, msg protoreflect.ProtoMessage) error {
 	outputDir, err := ioutil.TempDir("", "coreNLP")

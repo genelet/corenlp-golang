@@ -12,7 +12,7 @@ import (
 	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
-// HttpClient runs Stanford CoreNLP process as a HTTP client
+// HttpClient runs Stanford CoreNLP as a HTTP client
 // The CoreNLP server must be actively running.
 //
 // see
@@ -27,9 +27,10 @@ type HttpClient struct {
 }
 
 // NewHttpClient creates an instance of HttpClient
-// annotators: the list of annotators.
-// args[0], optional: the server address, default to http://127.0.0.1:9000
 //
+// annotators: the list of annotators;
+//
+// args[0], optional: the server address, default to http://127.0.0.1:9000;
 //
 func NewHttpClient(annotators []string, args ...string) *HttpClient {
     curl := "http://127.0.0.1:9000"
@@ -43,11 +44,9 @@ func NewHttpClient(annotators []string, args ...string) *HttpClient {
 	return &HttpClient{annotators, curl}
 }
 
-// Run using the input file, and get the parsed document in msg
+// Runs on the input file, and gets the NLP data in msg
 //
-// Document is the root component in the auto-generated protobuf GO package
-// from the protobuf definition file
-// https://github.com/stanfordnlp/CoreNLP/blob/main/src/edu/stanford/nlp/pipeline/CoreNLP.proto
+// Note that Document{} is the root component in the auto-generated NLP protobuf package.
 // 
 func (self *HttpClient) Run(ctx context.Context, input string, msg protoreflect.ProtoMessage) error {
     data, err := ioutil.ReadFile(input)
@@ -57,7 +56,7 @@ func (self *HttpClient) Run(ctx context.Context, input string, msg protoreflect.
     return self.RunText(ctx, data, msg)
 }
 
-// RunText on the text string, and get the parsed document in msg
+// RunText runs on the text string, and gets the NLP data in msg
 //
 func (self *HttpClient) RunText(ctx context.Context, text []byte, msg protoreflect.ProtoMessage) error {
 	str := ``

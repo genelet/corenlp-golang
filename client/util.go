@@ -6,7 +6,7 @@ import (
 	"google.golang.org/protobuf/encoding/protowire"
 )
 
-// Unmarshal coreNLP profile data
+// BytesUnmarshal unmarshals coreNLP protobuf data
 //
 func BytesUnmarshal(data []byte, msg protoreflect.ProtoMessage) error {
 	bs, n := protowire.ConsumeBytes(data)
