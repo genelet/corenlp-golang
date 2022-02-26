@@ -50,7 +50,7 @@ The neutral language processing data can be summaried in [protobuf](https://deve
 
 https://github.com/stanfordnlp/CoreNLP/blob/main/src/edu/stanford/nlp/pipeline/CoreNLP.proto
 
-The auto-generated GO packge is named as [github.com/genelet/coreNLP/nlp](https://github.com/genelet/coreNLP/nlp).
+The auto-generated GO packge is named as [github.com/genelet/coreNLP/nlp](https://github.com/genelet/coreNLP/tree/main/nlp).
 
 <br /><br />
 
@@ -94,7 +94,7 @@ func main() {
 }
 ```
 It outputs:
-```bash
+```
         Word        Lemma      Pos
   --------------------------------
     Stanford     Stanford      NNP
@@ -153,4 +153,4 @@ It outputs:
            .            .        .
 ```
 
-Please check [here]() for the complete document.
+Please check [https://godoc.org/github.com/genelet/coreNLP](https://godoc.org/github.com/genelet/coreNLP) for the complete document.
