@@ -68,22 +68,22 @@ Function *RunText* is the same program but using text input directly.
 package main
 
 import (
-	"context"
-        "fmt"
-	"github.com/genelet/coreNLP/client"
-	"github.com/genelet/coreNLP/nlp"
+    "context"
+    "fmt"
+    "github.com/genelet/coreNLP/client"
+    "github.com/genelet/coreNLP/nlp"
 )
 
 func main() {
-	// assuming the Stanford CoreNLP is downloaded into /home/user/stanford-corenlp-4.4.0
+    // assuming the Stanford CoreNLP is downloaded into /home/user/stanford-corenlp-4.4.0
 
-	// create a new Cmd instance
-	cmd := NewCmd([]string{"tokenize","ssplit","pos","lemma","parse","depparse"}, "/home/user/stanford-corenlp-4.4.0/*")
+    // create a new Cmd instance
+    cmd := NewCmd([]string{"tokenize","ssplit","pos","lemma","parse","depparse"}, "/home/user/stanford-corenlp-4.4.0/*")
 
-	// a reference to the nlp Document
-	pb := &nlp.Document{}
+    // a reference to the nlp Document
+    pb := &nlp.Document{}
 
-	err := cmd.RunText(context.Background(), []byte(`Stanford University is located in California. It is a great university, founded in 1891.`), pb)
+    err := cmd.RunText(context.Background(), []byte(`Stanford University is located in California. It is a great university, founded in 1891.`), pb)
     if err != nil { panic(err) }
 
     fmt.Printf("%12.12s %12.12s %8.8s\n", "Word", "Lemma", "Pos")
