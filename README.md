@@ -49,7 +49,7 @@ $ systemctl --user daemon-reload
 
 #### 1.3) The *proto* definition
 
-The data that CoreNLP returns from neutral language processing can be summaried in a [protobuf](https://developers.google.com/protocol-buffers/docs/overview):
+The data that CoreNLP returns from neutral language processing can be summaried in a [protocol buffer](https://developers.google.com/protocol-buffers/docs/overview):
 
 https://github.com/stanfordnlp/CoreNLP/blob/main/src/edu/stanford/nlp/pipeline/CoreNLP.proto
 
