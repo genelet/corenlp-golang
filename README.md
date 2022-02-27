@@ -1,5 +1,5 @@
 # coreNLP
-*coreNLP* is a Golang wrapper to access the full Stanford CoreNLP components.
+*coreNLP* is a GO client to access the complete set of [Stanford CoreNLP](https://stanfordnlp.github.io/CoreNLP/index.html) components.
 
 [![GoDoc](https://godoc.org/github.com/genelet/coreNLP?status.svg)](https://godoc.org/github.com/genelet/coreNLP)
 
@@ -7,23 +7,26 @@
 
 > $ go get -u github.com/genelet/coreNLP
 
-This GO client package should be used with either the CoreNLP command line program or a CoreNLP web service. Please check the following document for detail:
-
-[https://stanfordnlp.github.io/CoreNLP/index.html](https://stanfordnlp.github.io/CoreNLP/index.html)
-
+This GO client package should be used with either command line program or web service.
 
 #### 1.1) Command Line
 
-Download the Stanford CoreNLP here and install it properly:
+Download the Stanford CoreNLP and unzip it:
 
 [https://stanfordnlp.github.io/CoreNLP/download.html](https://stanfordnlp.github.io/CoreNLP/download.html).
 
+Go to the directory and make sure to the following command line can run properly:
+
+```bash
+$ java -cp "*" edu.stanford.nlp.pipeline.StanfordCoreNLP -file input.txt
+```
 
 #### 1.2) Web Service
 
-Besides the command line, you may launch CoreNLP as a Web service. 
+CoreNLP can also be launched as a http Web service. 
 
-For example, in your personal Ubuntu account, 
+For example, under a Ubuntu account, create the following startup script and run it as a service.
+
 ```bash
 $ vi ~/.config/systemd/user/coreNLP.service 
 
@@ -46,23 +49,22 @@ $ systemctl --user daemon-reload
 
 #### 1.3) The *proto* definition
 
-The neutral language processing data can be summaried in [protobuf](https://developers.google.com/protocol-buffers/docs/overview):
+The data that CoreNLP returns from neutral language processing can be summaried in a [protobuf](https://developers.google.com/protocol-buffers/docs/overview):
 
 https://github.com/stanfordnlp/CoreNLP/blob/main/src/edu/stanford/nlp/pipeline/CoreNLP.proto
 
-The auto-generated GO packge is named as [github.com/genelet/coreNLP/nlp](https://github.com/genelet/coreNLP/tree/main/nlp).
+The auto-generated GO packge is included in [github.com/genelet/coreNLP/nlp](https://github.com/genelet/coreNLP/tree/main/nlp).
 
 <br /><br />
 
 ## 2. Usage
 
-Function *Run* is implemented in both 
-the command line interface and the http web interface. By assign an input text
-in a file, this function returns the NLP data as a protobuf message.
+There are two functions implemented:
 
-Function *RunText* is the same program but using text input directly.
+- *Run*: it reads neutral language from a text file, and returns the NLP data as protobuf message.
+- *RunText*: the same as *Run* but reads text directly.
 
-#### 2.1) Command Line Interface
+#### 2.1) Use Command Line Interface
 
 ```go
 package main
@@ -76,16 +78,17 @@ import (
 
 func main() {
     // assuming the Stanford CoreNLP is downloaded into /home/user/stanford-corenlp-4.4.0
-
     // create a new Cmd instance
     cmd := NewCmd([]string{"tokenize","ssplit","pos","lemma","parse","depparse"}, "/home/user/stanford-corenlp-4.4.0/*")
 
     // a reference to the nlp Document
     pb := &nlp.Document{}
 
+    // run NLP and receive data in pb
     err := cmd.RunText(context.Background(), []byte(`Stanford University is located in California. It is a great university, founded in 1891.`), pb)
     if err != nil { panic(err) }
 
+    // print some result
     fmt.Printf("%12.12s %12.12s %8.8s\n", "Word", "Lemma", "Pos")
     fmt.Printf("%s\n", "  --------------------------------")
     for _, token := range pb.Sentence[0].Token {
@@ -122,16 +125,17 @@ import (
 
 func main() {
     // assuming the Stanford CoreNLP is running at http://localhost:9000
-
     // create a new HttpClient instance
     cmd := NewHttpClient([]string{"tokenize","ssplit","pos","lemma","parse","depparse"}, "http://localhost:9000")
 
     // a reference to the nlp Document
     pb := &nlp.Document{}
 
+    // run NLP and receive data in pb
     err := cmd.RunText(context.Background(), []byte(`Stanford University is located in California. It is a great university, founded in 1891.`), pb)
     if err != nil { panic(err) }
-
+    
+    // print some result
     fmt.Printf("%12.12s %12.12s %8.8s\n", "Word", "Lemma", "Pos")
     fmt.Printf("%s\n", "  --------------------------------")
     for _, token := range pb.Sentence[0].Token {
