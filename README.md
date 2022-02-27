@@ -79,7 +79,7 @@ import (
 func main() {
     // assuming the Stanford CoreNLP is downloaded into /home/user/stanford-corenlp-4.4.0
     // create a new Cmd instance
-    cmd := NewCmd([]string{"tokenize","ssplit","pos","lemma","parse","depparse"}, "/home/user/stanford-corenlp-4.4.0/*")
+    cmd := client.NewCmd([]string{"tokenize","ssplit","pos","lemma","parse","depparse"}, "/home/user/stanford-corenlp-4.4.0/*")
 
     // a reference to the nlp Document
     pb := &nlp.Document{}
@@ -126,7 +126,7 @@ import (
 func main() {
     // assuming the Stanford CoreNLP is running at http://localhost:9000
     // create a new HttpClient instance
-    cmd := NewHttpClient([]string{"tokenize","ssplit","pos","lemma","parse","depparse"}, "http://localhost:9000")
+    cmd := client.NewHttpClient([]string{"tokenize","ssplit","pos","lemma","parse","depparse"}, "http://localhost:9000")
 
     // a reference to the nlp Document
     pb := &nlp.Document{}
