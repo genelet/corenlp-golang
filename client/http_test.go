@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/genelet/coreNLP/nlp"
+	"github.com/genelet/corenlp-golang/nlp"
 )
 
 func TestCoreNLP(t *testing.T) {

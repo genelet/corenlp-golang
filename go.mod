@@ -1,4 +1,4 @@
-module github.com/genelet/coreNLP
+module github.com/genelet/corenlp-golang
 
 go 1.17
 
