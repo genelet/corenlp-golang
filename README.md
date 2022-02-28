@@ -1,5 +1,5 @@
-# coreNLP
-*coreNLP* is a GO client to access the complete set of [Stanford CoreNLP](https://stanfordnlp.github.io/CoreNLP/index.html) components.
+# corenlp-golang
+*corenlp-golang* is a GO client to access the complete set of [Stanford CoreNLP](https://stanfordnlp.github.io/CoreNLP/index.html) components.
 
 [![GoDoc](https://godoc.org/github.com/genelet/corenlp-golang?status.svg)](https://godoc.org/github.com/genelet/corenlp-golang)
 
