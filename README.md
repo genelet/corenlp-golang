@@ -1,11 +1,11 @@
 # coreNLP
 *coreNLP* is a GO client to access the complete set of [Stanford CoreNLP](https://stanfordnlp.github.io/CoreNLP/index.html) components.
 
-[![GoDoc](https://godoc.org/github.com/genelet/coreNLP?status.svg)](https://godoc.org/github.com/genelet/coreNLP)
+[![GoDoc](https://godoc.org/github.com/genelet/corenlp-golang?status.svg)](https://godoc.org/github.com/genelet/corenlp-golang)
 
 ## 1. Installation
 
-> $ go get -u github.com/genelet/coreNLP
+> $ go get -u github.com/genelet/corenlp-golang
 
 This GO client package should be used with either command line program or web service.
 
@@ -53,7 +53,7 @@ The data that CoreNLP returns from neutral language processing can be summaried 
 
 https://github.com/stanfordnlp/CoreNLP/blob/main/src/edu/stanford/nlp/pipeline/CoreNLP.proto
 
-The auto-generated GO packge is included in [github.com/genelet/coreNLP/nlp](https://github.com/genelet/coreNLP/tree/main/nlp).
+The auto-generated GO packge is included in [github.com/genelet/corenlp-golang/nlp](https://github.com/genelet/corenlp-golang/tree/main/nlp)
 
 <br /><br />
 
@@ -72,8 +72,8 @@ package main
 import (
     "context"
     "fmt"
-    "github.com/genelet/coreNLP/client"
-    "github.com/genelet/coreNLP/nlp"
+    "github.com/genelet/corenlp-golang/client"
+    "github.com/genelet/corenlp-golang/nlp"
 )
 
 func main() {
@@ -119,8 +119,8 @@ package main
 import (
     "context"
     "fmt"
-    "github.com/genelet/coreNLP/client"
-    "github.com/genelet/coreNLP/nlp"
+    "github.com/genelet/corenlp-golang/client"
+    "github.com/genelet/corenlp-golang/nlp"
 )
 
 func main() {
@@ -157,4 +157,4 @@ It outputs:
            .            .        .
 ```
 
-Please check [https://godoc.org/github.com/genelet/coreNLP](https://godoc.org/github.com/genelet/coreNLP) for the complete document.
+Please check [https://godoc.org/github.com/genelet/corenlp-golang](https://godoc.org/github.com/genelet/corenlp-golang) for the complete document.
