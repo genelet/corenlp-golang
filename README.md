@@ -49,7 +49,7 @@ $ systemctl --user daemon-reload
 
 #### 1.3) The *proto* definition
 
-The data that CoreNLP returns from neutral language processing can be summaried in a [protocol buffer](https://developers.google.com/protocol-buffers/docs/overview):
+The data that CoreNLP returns from natural language processing can be summaried in a [protocol buffer](https://developers.google.com/protocol-buffers/docs/overview):
 
 https://github.com/stanfordnlp/CoreNLP/blob/main/src/edu/stanford/nlp/pipeline/CoreNLP.proto
 
@@ -61,7 +61,7 @@ The auto-generated GO packge is included in [github.com/genelet/corenlp-golang/n
 
 There are two functions implemented:
 
-- *Run*: it reads neutral language from a text file, and returns the NLP data as protobuf message.
+- *Run*: it reads natural language from a text file, and returns the NLP data as protobuf message.
 - *RunText*: the same as *Run* but reads text directly.
 
 #### 2.1) Use Command Line Interface
