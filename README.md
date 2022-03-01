@@ -1,5 +1,5 @@
 # corenlp-golang
-*corenlp-golang* is a GO client to access the complete set of [Stanford CoreNLP](https://stanfordnlp.github.io/CoreNLP/index.html) natural language processing data defined by *CoreNLP.proto*.
+*corenlp-golang* is a GO client to access the complete data set of [Stanford CoreNLP](https://stanfordnlp.github.io/CoreNLP/index.html) defined by *CoreNLP.proto*.
 
 [![GoDoc](https://godoc.org/github.com/genelet/corenlp-golang?status.svg)](https://godoc.org/github.com/genelet/corenlp-golang)
 
