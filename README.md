@@ -3,6 +3,8 @@
 
 [![GoDoc](https://godoc.org/github.com/genelet/corenlp-golang?status.svg)](https://godoc.org/github.com/genelet/corenlp-golang)
 
+The corrent version v0.4.5 is applied to the CoreNLP version 4.5.4.
+
 ## 1. Installation
 
 > $ go get -u github.com/genelet/corenlp-golang
