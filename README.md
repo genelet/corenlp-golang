@@ -354,27 +354,60 @@ tokensWithMeta := client.ExtractTokensWithMetadata(doc)
 
 ## 📚 Annotator Reference
 
+### Core Annotators
+
 | Annotator | Type-Safe Constant | Description | Dependencies |
 |-----------|-------------------|-------------|--------------|
 | **tokenize** | `AnnotatorTokenize` | Splits text into tokens/words | - |
+| **cleanxml** | `AnnotatorCleanXML` | Removes XML tags from document | - |
 | **ssplit** | `AnnotatorSSplit` | Splits text into sentences | tokenize |
+| **docdate** | `AnnotatorDocDate` | Extracts document date | - |
 | **pos** | `AnnotatorPOS` | Part-of-speech tagging | tokenize, ssplit |
 | **lemma** | `AnnotatorLemma` | Lemmatization (base forms) | tokenize, ssplit, pos |
+
+### Named Entity Recognition
+
+| Annotator | Type-Safe Constant | Description | Dependencies |
+|-----------|-------------------|-------------|--------------|
 | **ner** | `AnnotatorNER` | Named entity recognition | tokenize, ssplit, pos, lemma |
 | **regexner** | `AnnotatorRegexNER` | Rule-based NER with regex | tokenize, ssplit, pos, lemma, ner |
 | **entitymentions** | `AnnotatorEntityMentions` | Entity mention detection | tokenize, ssplit, pos, lemma, ner |
 | **entitylink** | `AnnotatorEntityLink` | Link entities to Wikipedia | tokenize, ssplit, pos, lemma, ner, entitymentions |
+
+### Parsing & Syntax
+
+| Annotator | Type-Safe Constant | Description | Dependencies |
+|-----------|-------------------|-------------|--------------|
 | **parse** | `AnnotatorParse` | Constituency parsing | tokenize, ssplit, pos |
 | **depparse** | `AnnotatorDepparse` | Dependency parsing | tokenize, ssplit, pos |
+
+### Coreference & Semantics
+
+| Annotator | Type-Safe Constant | Description | Dependencies |
+|-----------|-------------------|-------------|--------------|
 | **coref** | `AnnotatorCoref` | Coreference resolution | tokenize, ssplit, pos, lemma, ner, parse |
 | **sentiment** | `AnnotatorSentiment` | Sentiment analysis | tokenize, ssplit, parse |
 | **natlog** | `AnnotatorNatlog` | Natural logic semantics | tokenize, ssplit, pos, lemma, depparse |
 | **openie** | `AnnotatorOpenie` | Open information extraction | tokenize, ssplit, pos, lemma, depparse, natlog |
-| **kbp** | `AnnotatorKBP` | Knowledge base population | tokenize, ssplit, pos, lemma, ner, parse, coref |
-| **quote** | `AnnotatorQuote` | Quote extraction | tokenize, ssplit |
-| **relation** | `AnnotatorRelation` | Relation extraction | tokenize, ssplit, pos, lemma, ner, parse |
+| **truecase** | `AnnotatorTruecase` | Determines true case of tokens | - |
+| **udfeats** | `AnnotatorUDFeats` | Universal Dependencies features | tokenize, ssplit, pos |
 
-See [annotators.go](client/annotators.go) for the complete list of 20+ available annotators.
+### Information Extraction
+
+| Annotator | Type-Safe Constant | Description | Dependencies |
+|-----------|-------------------|-------------|--------------|
+| **relation** | `AnnotatorRelation` | Relation extraction | tokenize, ssplit, pos, lemma, ner, parse |
+| **kbp** | `AnnotatorKBP` | Knowledge base population | tokenize, ssplit, pos, lemma, ner, parse, coref |
+
+### Text Processing
+
+| Annotator | Type-Safe Constant | Description | Dependencies |
+|-----------|-------------------|-------------|--------------|
+| **quote** | `AnnotatorQuote` | Quote extraction | tokenize, ssplit |
+| **quote.attribution** | `AnnotatorQuoteAttribution` | Quote attribution to speakers | tokenize, ssplit, pos, lemma, ner, depparse, coref, quote |
+| **tokensregex** | `AnnotatorTokensRegex` | TokensRegex pattern matching | tokenize, ssplit |
+
+See [annotators.go](client/annotators.go) for the complete list of all 25+ available annotators with detailed documentation.
 
 ## 💡 Best Practices
 

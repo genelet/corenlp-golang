@@ -15,9 +15,17 @@ const (
 	// This is typically the first annotator in any pipeline.
 	AnnotatorTokenize Annotator = "tokenize"
 
+	// AnnotatorCleanXML removes XML tags from the document.
+	// This should typically run before tokenization.
+	AnnotatorCleanXML Annotator = "cleanxml"
+
 	// AnnotatorSSplit divides tokenized text into sentences.
 	// Requires: tokenize
 	AnnotatorSSplit Annotator = "ssplit"
+
+	// AnnotatorDocDate extracts the document date.
+	// This can be used independently or as a dependency for other annotators.
+	AnnotatorDocDate Annotator = "docdate"
 
 	// AnnotatorPOS assigns part-of-speech tags to tokens (e.g., noun, verb, adjective).
 	// Requires: tokenize, ssplit
@@ -90,6 +98,14 @@ const (
 	// AnnotatorOpenie extracts open-domain relation triples from sentences.
 	// Requires: tokenize, ssplit, pos, lemma, depparse, natlog
 	AnnotatorOpenie Annotator = "openie"
+
+	// AnnotatorTruecase determines the true case of tokens in the text.
+	// Useful for text that is all lowercase or all uppercase.
+	AnnotatorTruecase Annotator = "truecase"
+
+	// AnnotatorUDFeats adds Universal Dependencies features to tokens.
+	// Requires: tokenize, ssplit, pos
+	AnnotatorUDFeats Annotator = "udfeats"
 )
 
 // Information extraction annotators
@@ -109,6 +125,10 @@ const (
 	// AnnotatorQuote identifies quotes delimited by single or double quotation marks.
 	// Requires: tokenize, ssplit
 	AnnotatorQuote Annotator = "quote"
+
+	// AnnotatorQuoteAttribution attributes quotes to speakers.
+	// Requires: tokenize, ssplit, pos, lemma, ner, depparse, coref, quote
+	AnnotatorQuoteAttribution Annotator = "quote.attribution"
 
 	// AnnotatorTokensRegex runs TokensRegex patterns within the NLP pipeline.
 	// Requires: tokenize, ssplit
