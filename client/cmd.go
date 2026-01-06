@@ -9,6 +9,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strings"
+
 	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
@@ -18,55 +19,57 @@ import (
 //
 // see
 // https://stanfordnlp.github.io/CoreNLP/index.html
-//
 type Cmd struct {
-// a slice of annotators. e.g. []string{"tokenize","ssplit","pos","depparse"}
-	Annotators  []string
+	// a slice of annotators. e.g. []string{"tokenize","ssplit","pos","depparse"}
+	Annotators []string
 
-// Classpath to the Java.
-	ClassPath   string
+	// Classpath to the Java.
+	ClassPath string
 
-// Class to run for annotators
-	Class       string
+	// Class to run for annotators
+	Class string
 
-	javaCmd     string
+	javaCmd string
 
-// extra arguments for the Java command
-	Args        []string
+	// extra arguments for the Java command
+	Args []string
 }
 
-// NewCmd creates an instance of Cmd.
+// NewCmd creates an instance of Cmd for running CoreNLP via command line.
 //
-// annotators: the list of annotators;
+// Parameters:
+//   - annotators: the list of annotators to run (e.g., tokenize, ssplit, pos, lemma, ner, parse)
+//   - args[0], optional: the Java Classpath (default: "*")
+//   - args[1], optional: the Java class to run (default: "edu.stanford.nlp.pipeline.StanfordCoreNLP")
+//   - args[2], optional: the Java command (default: "java")
+//   - args[3:], optional: additional Java arguments
 //
-// args[0], optional: the Java Classpath;
+// Example usage with string annotators (backwards compatible):
 //
-// args[1], optional: the Java class;
+//	cmd := NewCmd([]string{"tokenize", "ssplit", "pos"}, "/home/user/stanford-corenlp-4.5.4/*")
 //
-// args[2], optional: the Java command;
+// Example usage with type-safe Annotator constants:
 //
-// args[3:], optional: other arguments.
+//	cmd := NewCmdWithAnnotators([]Annotator{AnnotatorTokenize, AnnotatorSSplit, AnnotatorPOS}, "/home/user/stanford-corenlp-4.5.4/*")
 //
-// For example, if the CoreNLP is downloaded and unzipped to /home/user/standford,
-// you can create instance:
-// NewCmd([]string{"tokenize","ssplit","pos"}, "/home/user/standford/*")
+// Or use predefined combinations:
 //
-// see
-// https://stanfordnlp.github.io/CoreNLP/cmdline.html
+//	cmd := NewCmdWithAnnotators(BasicAnnotators, "/home/user/stanford-corenlp-4.5.4/*")
 //
+// See https://stanfordnlp.github.io/CoreNLP/cmdline.html for more information.
 func NewCmd(annotators []string, args ...string) *Cmd {
 	cp := "*"
-	c  := "edu.stanford.nlp.pipeline.StanfordCoreNLP"
+	c := "edu.stanford.nlp.pipeline.StanfordCoreNLP"
 	java := "java"
-	if args != nil && len(args)>0 {
+	if len(args) > 0 {
 		cp = args[0]
 		args = args[1:]
 	}
-	if args != nil && len(args)>0 {
+	if len(args) > 0 {
 		c = args[0]
 		args = args[1:]
 	}
-	if args != nil && len(args)>0 {
+	if len(args) > 0 {
 		java = args[0]
 		args = args[1:]
 	}
@@ -74,10 +77,28 @@ func NewCmd(annotators []string, args ...string) *Cmd {
 	return &Cmd{annotators, cp, c, java, args}
 }
 
+// NewCmdWithAnnotators creates an instance of Cmd using type-safe Annotator constants.
+// This provides better IDE autocomplete and compile-time checking for annotator names.
+//
+// Parameters are the same as NewCmd, but annotators use the Annotator type.
+//
+// Example:
+//
+//	cmd := NewCmdWithAnnotators(
+//	    []Annotator{AnnotatorTokenize, AnnotatorSSplit, AnnotatorPOS, AnnotatorLemma},
+//	    "/home/user/stanford-corenlp-4.5.4/*",
+//	)
+//
+// Or use predefined combinations:
+//
+//	cmd := NewCmdWithAnnotators(BasicAnnotators, "/home/user/stanford-corenlp-4.5.4/*")
+func NewCmdWithAnnotators(annotators []Annotator, args ...string) *Cmd {
+	return NewCmd(AnnotatorsToStrings(annotators), args...)
+}
+
 // Runs on the input file, and gets the NLP data in msg.
 //
 // Note that Document{} is the root component in the auto-generated NLP protobuf package.
-// 
 func (self *Cmd) Run(ctx context.Context, input string, msg protoreflect.ProtoMessage) error {
 	data, err := ioutil.ReadFile(input)
 	if err != nil {
@@ -86,18 +107,28 @@ func (self *Cmd) Run(ctx context.Context, input string, msg protoreflect.ProtoMe
 	return self.RunText(ctx, data, msg)
 }
 
-// RunText runs on the text string, and gets the NLP data in msg
+// RunText runs NLP analysis on the text string and populates msg with the results.
 //
+// The msg parameter should typically be a pointer to nlp.Document{}.
+// Returns an error if the text is empty, msg is nil, or the command execution fails.
 func (self *Cmd) RunText(ctx context.Context, text []byte, msg protoreflect.ProtoMessage) error {
+	// Validate inputs
+	if len(text) == 0 {
+		return ErrEmptyInput
+	}
+	if msg == nil {
+		return ErrNilMessage
+	}
+
 	outputDir, err := ioutil.TempDir("", "coreNLP")
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to create temp directory: %w", err)
 	}
 	defer os.RemoveAll(outputDir)
 
 	input := filepath.Join(outputDir, "input.text")
 	if err = ioutil.WriteFile(input, text, 0666); err != nil {
-		return err
+		return fmt.Errorf("failed to write input file: %w", err)
 	}
 
 	args := self.Args
@@ -105,7 +136,7 @@ func (self *Cmd) RunText(ctx context.Context, text []byte, msg protoreflect.Prot
 		args = append(args, "-cp", self.ClassPath)
 	}
 	args = append(args, self.Class)
-	if self.Annotators != nil && len(self.Annotators) > 0 {
+	if len(self.Annotators) > 0 {
 		args = append(args, "-annotators", strings.Join(self.Annotators, ","))
 	}
 
@@ -126,12 +157,16 @@ func (self *Cmd) RunText(ctx context.Context, text []byte, msg protoreflect.Prot
 	cmd.Stderr = stderr
 
 	if err := cmd.Run(); err != nil {
-		return fmt.Errorf("%s: %s", err.Error(), stderr.String())
+		return &CommandError{
+			Command: self.javaCmd,
+			Stderr:  stderr.String(),
+			Err:     err,
+		}
 	}
 
-	data, err := ioutil.ReadFile(input+".ser.gz")
+	data, err := ioutil.ReadFile(input + ".ser.gz")
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to read output file: %w", err)
 	}
 
 	return BytesUnmarshal(data, msg)

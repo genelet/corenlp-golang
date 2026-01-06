@@ -21,9 +21,7 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-//
 // An enumeration for the valid languages allowed in CoreNLP
-//
 type Language int32
 
 const (
@@ -107,9 +105,7 @@ func (Language) EnumDescriptor() ([]byte, []int) {
 	return file_proto_coreNLP_proto_rawDescGZIP(), []int{0}
 }
 
-//
 // An enumeration of valid sentiment values for the sentiment classifier.
-//
 type Sentiment int32
 
 const (
@@ -175,9 +171,7 @@ func (Sentiment) EnumDescriptor() ([]byte, []int) {
 	return file_proto_coreNLP_proto_rawDescGZIP(), []int{1}
 }
 
-//
 // The seven informative Natural Logic relations
-//
 type NaturalLogicRelation int32
 
 const (
@@ -249,9 +243,7 @@ func (NaturalLogicRelation) EnumDescriptor() ([]byte, []int) {
 	return file_proto_coreNLP_proto_rawDescGZIP(), []int{2}
 }
 
-//
 // A document; that is, the equivalent of an Annotation.
-//
 type Document struct {
 	state           protoimpl.MessageState
 	sizeCache       protoimpl.SizeCache
@@ -453,9 +445,7 @@ func (x *Document) GetEntityMentionToCorefMentionMappings() []int32 {
 	return nil
 }
 
-//
 // The serialized version of a CoreMap representing a sentence.
-//
 type Sentence struct {
 	state           protoimpl.MessageState
 	sizeCache       protoimpl.SizeCache
@@ -885,9 +875,7 @@ func (x *Sentence) GetSpeakerType() string {
 	return ""
 }
 
-//
 // The serialized version of a Token (a CoreLabel).
-//
 type Token struct {
 	state           protoimpl.MessageState
 	sizeCache       protoimpl.SizeCache
@@ -1459,9 +1447,7 @@ func (x *Token) GetCodepointOffsetEnd() uint32 {
 	return 0
 }
 
-//
 // A quotation marker in text
-//
 type Quote struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -1669,9 +1655,7 @@ func (x *Quote) GetAttributionDependencyGraph() *DependencyGraph {
 	return nil
 }
 
-//
 // A syntactic parse tree, with scores.
-//
 type ParseTree struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -1759,9 +1743,7 @@ func (x *ParseTree) GetSentiment() Sentiment {
 	return Sentiment_STRONG_NEGATIVE
 }
 
-//
 // A dependency graph representation.
-//
 type DependencyGraph struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -1835,10 +1817,8 @@ func (x *DependencyGraph) GetToken() []*Token {
 	return nil
 }
 
-//
 // A coreference chain.
 // These fields are not *really* optional. CoreNLP will crash without them.
-//
 type CorefChain struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -2395,9 +2375,7 @@ func (x *SpeakerInfo) GetMentions() []int32 {
 	return nil
 }
 
-//
 // A Span of text
-//
 type Span struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -2453,10 +2431,8 @@ func (x *Span) GetEnd() uint32 {
 	return 0
 }
 
-//
 // A Timex object, representing a temporal expression (TIMe EXpression)
 // These fields are not *really* optional. CoreNLP will crash without them.
-//
 type Timex struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -2552,11 +2528,9 @@ func (x *Timex) GetEndPoint() uint32 {
 	return 0
 }
 
-//
 // A representation of an entity in a relation.
 // This corresponds to the EntityMention, and more broadly the
 // ExtractionObject classes.
-//
 type Entity struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -2685,9 +2659,7 @@ func (x *Entity) GetSubtype() string {
 	return ""
 }
 
-//
 // A representation of a relation, mirroring RelationMention
-//
 type Relation struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -2792,9 +2764,7 @@ func (x *Relation) GetSubtype() string {
 	return ""
 }
 
-//
 // A Natural Logic operator
-//
 type Operator struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -2890,9 +2860,7 @@ func (x *Operator) GetObjectSpanEnd() int32 {
 	return 0
 }
 
-//
 // The polarity of a word, according to Natural Logic
-//
 type Polarity struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -2988,9 +2956,7 @@ func (x *Polarity) GetProjectIndependence() NaturalLogicRelation {
 	return NaturalLogicRelation_EQUIVALENCE
 }
 
-//
 // An NER mention in the text
-//
 type NERMention struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -3126,10 +3092,8 @@ func (x *NERMention) GetEntityMentionText() string {
 	return ""
 }
 
-//
 // An entailed sentence fragment.
 // Created by the openie annotator.
-//
 type SentenceFragment struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -3201,10 +3165,8 @@ func (x *SentenceFragment) GetScore() float64 {
 	return 0
 }
 
-//
 // The index of a token in a document, including the sentence
 // index and the offset.
-//
 type TokenLocation struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -3260,10 +3222,8 @@ func (x *TokenLocation) GetTokenIndex() uint32 {
 	return 0
 }
 
-//
 // An OpenIE relation triple.
 // Created by the openie annotator.
-//
 type RelationTriple struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -3399,10 +3359,8 @@ func (x *RelationTriple) GetSuffixOf() bool {
 	return false
 }
 
-//
 // A map from strings to strings.
 // Used, minimally, in the CoNLLU featurizer
-//
 type MapStringString struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -3458,10 +3416,8 @@ func (x *MapStringString) GetValue() []string {
 	return nil
 }
 
-//
 // A map from integers to strings.
 // Used, minimally, in the CoNLLU featurizer
-//
 type MapIntString struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache

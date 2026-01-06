@@ -17,71 +17,119 @@ import (
 //
 // see
 // https://stanfordnlp.github.io/CoreNLP/index.html
-//
 type HttpClient struct {
-// a slice of annotators. e.g. []string{"tokenize","ssplit","pos","depparse"}
+	// a slice of annotators. e.g. []string{"tokenize","ssplit","pos","depparse"}
 	Annotators []string
 
-// server's URL 
-	URL        string
+	// server's URL
+	URL string
 }
 
-// NewHttpClient creates an instance of HttpClient
+// NewHttpClient creates an instance of HttpClient for connecting to a CoreNLP server.
 //
-// annotators: the list of annotators;
+// Parameters:
+//   - annotators: the list of annotators to run
+//   - args[0], optional: the server address (default: "http://127.0.0.1:9000")
 //
-// args[0], optional: the server address, default to http://127.0.0.1:9000;
+// Example usage with string annotators (backwards compatible):
 //
+//	client := NewHttpClient([]string{"tokenize", "ssplit", "pos"}, "http://localhost:9000")
+//
+// Example usage with type-safe Annotator constants:
+//
+//	client := NewHttpClientWithAnnotators([]Annotator{AnnotatorTokenize, AnnotatorSSplit, AnnotatorPOS})
+//
+// Or use predefined combinations:
+//
+//	client := NewHttpClientWithAnnotators(BasicAnnotators, "http://localhost:9000")
 func NewHttpClient(annotators []string, args ...string) *HttpClient {
-    curl := "http://127.0.0.1:9000"
-	if args != nil {
+	curl := "http://127.0.0.1:9000"
+	if len(args) > 0 {
 		curl = args[0]
 	}
 
-	if curl[len(curl)-2:] != `/` {
-		curl += `/`
+	// Fix: Check last character, not last 2 characters
+	if len(curl) > 0 && curl[len(curl)-1:] != "/" {
+		curl += "/"
 	}
 	return &HttpClient{annotators, curl}
+}
+
+// NewHttpClientWithAnnotators creates an instance of HttpClient using type-safe Annotator constants.
+// This provides better IDE autocomplete and compile-time checking for annotator names.
+//
+// Parameters are the same as NewHttpClient, but annotators use the Annotator type.
+//
+// Example:
+//
+//	client := NewHttpClientWithAnnotators(
+//	    []Annotator{AnnotatorTokenize, AnnotatorSSplit, AnnotatorPOS, AnnotatorLemma},
+//	    "http://localhost:9000",
+//	)
+//
+// Or use predefined combinations:
+//
+//	client := NewHttpClientWithAnnotators(BasicAnnotators)
+func NewHttpClientWithAnnotators(annotators []Annotator, args ...string) *HttpClient {
+	return NewHttpClient(AnnotatorsToStrings(annotators), args...)
 }
 
 // Runs on the input file, and gets the NLP data in msg
 //
 // Note that Document{} is the root component in the auto-generated NLP protobuf package.
-// 
 func (self *HttpClient) Run(ctx context.Context, input string, msg protoreflect.ProtoMessage) error {
-    data, err := ioutil.ReadFile(input)
-    if err != nil {
-        return err
-    }
-    return self.RunText(ctx, data, msg)
+	data, err := ioutil.ReadFile(input)
+	if err != nil {
+		return err
+	}
+	return self.RunText(ctx, data, msg)
 }
 
-// RunText runs on the text string, and gets the NLP data in msg
+// RunText runs NLP analysis on the text string and populates msg with the results.
 //
+// The msg parameter should typically be a pointer to nlp.Document{}.
+// Returns an error if the text is empty, msg is nil, or the server request fails.
 func (self *HttpClient) RunText(ctx context.Context, text []byte, msg protoreflect.ProtoMessage) error {
+	// Validate inputs
+	if len(text) == 0 {
+		return ErrEmptyInput
+	}
+	if msg == nil {
+		return ErrNilMessage
+	}
+
 	str := ``
 	if self.Annotators != nil {
 		str = `"annotators":"` + strings.Join(self.Annotators, ",") + `",`
 	}
-	curl := self.URL + `?properties=`+ url.QueryEscape(`{`+str+`"outputFormat":"serialized","serializer":"edu.stanford.nlp.pipeline.ProtobufAnnotationSerializer"}`)
+	curl := self.URL + `?properties=` + url.QueryEscape(`{`+str+`"outputFormat":"serialized","serializer":"edu.stanford.nlp.pipeline.ProtobufAnnotationSerializer"}`)
 
 	req, err := http.NewRequestWithContext(ctx, "POST", curl, bytes.NewReader(text))
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to create HTTP request: %w", err)
 	}
 
 	defaultClient := &http.Client{Transport: http.DefaultTransport}
 	res, err := defaultClient.Do(req)
 	if err != nil {
-		return err
-	} else if res.StatusCode < 200 || res.StatusCode >= 300 {
-		return fmt.Errorf("HTTP status %s\n", res.Status)
+		return &ServerError{
+			URL:     self.URL,
+			Message: err.Error(),
+		}
+	}
+
+	if res.StatusCode < 200 || res.StatusCode >= 300 {
+		return &ServerError{
+			URL:        self.URL,
+			StatusCode: res.StatusCode,
+			Message:    fmt.Sprintf("HTTP status %s", res.Status),
+		}
 	}
 
 	body, err := ioutil.ReadAll(res.Body)
 	res.Body.Close()
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to read response body: %w", err)
 	}
 
 	return BytesUnmarshal(body, msg)
