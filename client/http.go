@@ -4,10 +4,12 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/url"
+	"os"
 	"strings"
+	"time"
 
 	"google.golang.org/protobuf/reflect/protoreflect"
 )
@@ -23,6 +25,19 @@ type HttpClient struct {
 
 	// server's URL
 	URL string
+
+	// HTTPClient is the underlying HTTP client used for requests.
+	// If nil, a default client with 30 second timeout will be used.
+	HTTPClient *http.Client
+}
+
+// DefaultHTTPClient returns an http.Client with sensible defaults for CoreNLP.
+// It includes a 30 second timeout and uses http.DefaultTransport for connection pooling.
+func DefaultHTTPClient() *http.Client {
+	return &http.Client{
+		Timeout:   30 * time.Second,
+		Transport: http.DefaultTransport,
+	}
 }
 
 // NewHttpClient creates an instance of HttpClient for connecting to a CoreNLP server.
@@ -52,7 +67,11 @@ func NewHttpClient(annotators []string, args ...string) *HttpClient {
 	if len(curl) > 0 && curl[len(curl)-1:] != "/" {
 		curl += "/"
 	}
-	return &HttpClient{annotators, curl}
+	return &HttpClient{
+		Annotators: annotators,
+		URL:        curl,
+		HTTPClient: DefaultHTTPClient(),
+	}
 }
 
 // NewHttpClientWithAnnotators creates an instance of HttpClient using type-safe Annotator constants.
@@ -77,19 +96,19 @@ func NewHttpClientWithAnnotators(annotators []Annotator, args ...string) *HttpCl
 // Runs on the input file, and gets the NLP data in msg
 //
 // Note that Document{} is the root component in the auto-generated NLP protobuf package.
-func (self *HttpClient) Run(ctx context.Context, input string, msg protoreflect.ProtoMessage) error {
-	data, err := ioutil.ReadFile(input)
+func (h *HttpClient) Run(ctx context.Context, input string, msg protoreflect.ProtoMessage) error {
+	data, err := os.ReadFile(input)
 	if err != nil {
 		return err
 	}
-	return self.RunText(ctx, data, msg)
+	return h.RunText(ctx, data, msg)
 }
 
 // RunText runs NLP analysis on the text string and populates msg with the results.
 //
 // The msg parameter should typically be a pointer to nlp.Document{}.
 // Returns an error if the text is empty, msg is nil, or the server request fails.
-func (self *HttpClient) RunText(ctx context.Context, text []byte, msg protoreflect.ProtoMessage) error {
+func (h *HttpClient) RunText(ctx context.Context, text []byte, msg protoreflect.ProtoMessage) error {
 	// Validate inputs
 	if len(text) == 0 {
 		return ErrEmptyInput
@@ -99,35 +118,39 @@ func (self *HttpClient) RunText(ctx context.Context, text []byte, msg protorefle
 	}
 
 	str := ``
-	if self.Annotators != nil {
-		str = `"annotators":"` + strings.Join(self.Annotators, ",") + `",`
+	if h.Annotators != nil {
+		str = `"annotators":"` + strings.Join(h.Annotators, ",") + `",`
 	}
-	curl := self.URL + `?properties=` + url.QueryEscape(`{`+str+`"outputFormat":"serialized","serializer":"edu.stanford.nlp.pipeline.ProtobufAnnotationSerializer"}`)
+	curl := h.URL + `?properties=` + url.QueryEscape(`{`+str+`"outputFormat":"serialized","serializer":"edu.stanford.nlp.pipeline.ProtobufAnnotationSerializer"}`)
 
 	req, err := http.NewRequestWithContext(ctx, "POST", curl, bytes.NewReader(text))
 	if err != nil {
 		return fmt.Errorf("failed to create HTTP request: %w", err)
 	}
 
-	defaultClient := &http.Client{Transport: http.DefaultTransport}
-	res, err := defaultClient.Do(req)
+	httpClient := h.HTTPClient
+	if httpClient == nil {
+		httpClient = DefaultHTTPClient()
+	}
+
+	res, err := httpClient.Do(req)
 	if err != nil {
 		return &ServerError{
-			URL:     self.URL,
+			URL:     h.URL,
 			Message: err.Error(),
 		}
 	}
+	defer res.Body.Close()
 
 	if res.StatusCode < 200 || res.StatusCode >= 300 {
 		return &ServerError{
-			URL:        self.URL,
+			URL:        h.URL,
 			StatusCode: res.StatusCode,
 			Message:    fmt.Sprintf("HTTP status %s", res.Status),
 		}
 	}
 
-	body, err := ioutil.ReadAll(res.Body)
-	res.Body.Close()
+	body, err := io.ReadAll(res.Body)
 	if err != nil {
 		return fmt.Errorf("failed to read response body: %w", err)
 	}

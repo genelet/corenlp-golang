@@ -8,7 +8,7 @@ import (
 )
 
 func TestCmd(t *testing.T) {
-	cmd := NewCmd([]string{"tokenize", "ssplit", "pos", "lemma", "parse", "depparse"}, "/home/peter/stanford-corenlp-4.4.0/*")
+	cmd := NewCmd([]string{"tokenize", "ssplit", "pos", "lemma", "parse", "depparse"}, "/home/peter/Workspace/stanford-corenlp-4.5.10/*")
 
 	pb := &nlp.Document{}
 	var text = `President Xi Jinping of Chaina, on his first state visit to the United States, showed off his familiarity with American history and pop culture on Tuesday night.`

@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -99,19 +98,19 @@ func NewCmdWithAnnotators(annotators []Annotator, args ...string) *Cmd {
 // Runs on the input file, and gets the NLP data in msg.
 //
 // Note that Document{} is the root component in the auto-generated NLP protobuf package.
-func (self *Cmd) Run(ctx context.Context, input string, msg protoreflect.ProtoMessage) error {
-	data, err := ioutil.ReadFile(input)
+func (c *Cmd) Run(ctx context.Context, input string, msg protoreflect.ProtoMessage) error {
+	data, err := os.ReadFile(input)
 	if err != nil {
 		return err
 	}
-	return self.RunText(ctx, data, msg)
+	return c.RunText(ctx, data, msg)
 }
 
 // RunText runs NLP analysis on the text string and populates msg with the results.
 //
 // The msg parameter should typically be a pointer to nlp.Document{}.
 // Returns an error if the text is empty, msg is nil, or the command execution fails.
-func (self *Cmd) RunText(ctx context.Context, text []byte, msg protoreflect.ProtoMessage) error {
+func (c *Cmd) RunText(ctx context.Context, text []byte, msg protoreflect.ProtoMessage) error {
 	// Validate inputs
 	if len(text) == 0 {
 		return ErrEmptyInput
@@ -120,24 +119,24 @@ func (self *Cmd) RunText(ctx context.Context, text []byte, msg protoreflect.Prot
 		return ErrNilMessage
 	}
 
-	outputDir, err := ioutil.TempDir("", "coreNLP")
+	outputDir, err := os.MkdirTemp("", "coreNLP")
 	if err != nil {
 		return fmt.Errorf("failed to create temp directory: %w", err)
 	}
 	defer os.RemoveAll(outputDir)
 
 	input := filepath.Join(outputDir, "input.text")
-	if err = ioutil.WriteFile(input, text, 0666); err != nil {
+	if err = os.WriteFile(input, text, 0666); err != nil {
 		return fmt.Errorf("failed to write input file: %w", err)
 	}
 
-	args := self.Args
-	if self.ClassPath != "" {
-		args = append(args, "-cp", self.ClassPath)
+	args := c.Args
+	if c.ClassPath != "" {
+		args = append(args, "-cp", c.ClassPath)
 	}
-	args = append(args, self.Class)
-	if len(self.Annotators) > 0 {
-		args = append(args, "-annotators", strings.Join(self.Annotators, ","))
+	args = append(args, c.Class)
+	if len(c.Annotators) > 0 {
+		args = append(args, "-annotators", strings.Join(c.Annotators, ","))
 	}
 
 	args = append(args,
@@ -150,7 +149,7 @@ func (self *Cmd) RunText(ctx context.Context, text []byte, msg protoreflect.Prot
 		"-outputSerializer",
 		"edu.stanford.nlp.pipeline.ProtobufAnnotationSerializer")
 
-	cmd := exec.CommandContext(ctx, self.javaCmd, args...)
+	cmd := exec.CommandContext(ctx, c.javaCmd, args...)
 	stdout := &bytes.Buffer{}
 	stderr := &bytes.Buffer{}
 	cmd.Stdout = stdout
@@ -158,13 +157,13 @@ func (self *Cmd) RunText(ctx context.Context, text []byte, msg protoreflect.Prot
 
 	if err := cmd.Run(); err != nil {
 		return &CommandError{
-			Command: self.javaCmd,
+			Command: c.javaCmd,
 			Stderr:  stderr.String(),
 			Err:     err,
 		}
 	}
 
-	data, err := ioutil.ReadFile(input + ".ser.gz")
+	data, err := os.ReadFile(input + ".ser.gz")
 	if err != nil {
 		return fmt.Errorf("failed to read output file: %w", err)
 	}
