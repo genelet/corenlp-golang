@@ -1,0 +1,731 @@
+syntax = "proto3";
+package querylite;
+
+option go_package = "github.com/genelet/sqlproto/xquerylite";
+
+// =============================================================================
+// BASIC TYPES (from sqlmeta)
+// =============================================================================
+
+message ObjectName {
+    repeated string Idents = 1;
+}
+
+enum NullValue {
+    NullValueUnknown = 0;
+    NullValueConfirm = 1;
+}
+
+// =============================================================================
+// DATA TYPES (from sqlmeta)
+// =============================================================================
+
+message BigInt {
+    bool IsUnsigned = 1;
+}
+
+message SmallInt {
+    bool IsUnsigned = 1;
+}
+
+message Int {
+    bool IsUnsigned = 1;
+}
+
+message TinyInt {
+    bool IsUnsigned = 1;
+}
+
+message MediumInt {
+    bool IsUnsigned = 1;
+}
+
+message Real {
+    bool IsUnsigned = 1;
+}
+
+message Float {
+    uint32 Size = 1;
+    bool IsUnsigned = 2;
+}
+
+message Decimal {
+    uint32 Precision = 1;
+    uint32 Scale = 2;
+    bool IsUnsigned = 3;
+}
+
+message CharType {
+    uint32 Size = 1;
+}
+
+message VarcharType {
+    uint32 Size = 1;
+}
+
+message Timestamp {
+    bool WithTimeZone = 1;
+}
+
+enum DataTypeSingle {
+    DataTypeSingleUnknown = 0;
+    Double = 1;
+    Boolean = 2;
+    Time = 3;
+    Date = 4;
+    Bytea = 5;
+    Text = 6;
+    Regclass = 7;
+    UUID = 8;
+    Year = 9;
+    JSON = 10;
+    XML = 11;
+}
+
+message BitType {
+    uint32 Size = 1;
+    bool Varying = 2;
+}
+
+message DoubleType {
+    bool is_double_precision = 1;
+}
+
+message CollateType {
+    DataType Type = 1;
+    string CollationName = 2;
+}
+
+message EnumType {
+    repeated string Values = 1;
+}
+
+message SetType {
+    repeated string Values = 1;
+}
+
+message StructData {
+    repeated StructField Fields = 1;
+}
+
+message StructField {
+    string Name = 1;
+    DataType DataType = 2;
+}
+
+message ArrayData {
+    DataType Type = 1;
+}
+
+message DataType {
+    oneof TypeClause {
+        Int IntData = 1;
+        SmallInt SmallIntData = 2;
+        BigInt BigIntData = 3;
+        Decimal DecimalData = 4;
+        CharType CharData = 8;
+        VarcharType VarcharData = 9;
+        ObjectName CustomData = 10;
+        ArrayData ArrayData = 11;
+        StructData StructData = 12;
+        DataTypeSingle UUIDData = 14;
+        Timestamp TimestampData = 15;
+        DataTypeSingle BooleanData = 13;
+        DataTypeSingle DateData = 16;
+        DataTypeSingle TimeData = 17;
+        DoubleType DoubleData = 18;
+        Float FloatData = 19;
+        Real RealData = 20;
+        DataTypeSingle TextData = 21;
+        BitType BitData = 22;
+        DataTypeSingle RegclassData = 23;
+        DataTypeSingle ByteaData = 24;
+        CollateType CollateData = 25;
+        EnumType EnumData = 26;
+        SetType SetData = 27;
+        TinyInt TinyIntData = 28;
+        MediumInt MediumIntData = 29;
+        DataTypeSingle YearData = 30;
+        DataTypeSingle JSONData = 31;
+        DataTypeSingle XMLData = 32;
+    }
+}
+
+// =============================================================================
+// OPERATORS
+// =============================================================================
+
+enum OperatorType {
+    Plus = 0;
+    Minus = 1;
+    Multiply = 2;
+    Divide = 3;
+    Modulus = 4;
+    Gt = 5;
+    Lt = 6;
+    GtEq = 7;
+    LtEq = 8;
+    Eq = 9;
+    NotEq = 10;
+    And = 11;
+    Or = 12;
+    Not = 13;
+    Like = 14;
+    NotLike = 15;
+    Overlap = 25;
+    Contains = 26;
+    ContainedBy = 27;
+    GeoSame = 28;
+    TextMatch = 29;
+    FactorialPrefix = 30;
+    BitwiseAnd = 31;
+    BitwiseOr = 32;
+    BitwiseXor = 33;
+    JSONB_Q = 52;
+    JSONB_Q_AMP = 53;
+    JSONB_Q_PIPE = 54;
+    JSONB_DASH_PIPE_DASH = 55;
+    JSONB_AT_Q = 56;
+    JSONB_HASH_DASH = 58;
+    JSONB_HASH_GT = 59;
+    JSONB_HASH_GT_GT = 60;
+    JSON_GET = 61;
+    JSON_GET_TEXT = 62;
+    RegexMatch = 63;
+    RegexNoMatch = 64;
+    RegexMatchCI = 65;
+    RegexNoMatchCI = 66;
+    Colon = 38;
+    None = 16;
+    CustomOp = 99;
+    StringConcat = 19;
+    Arrow = 20;
+    ArrayElement = 17;
+    Variadic = 44;
+}
+
+message Operator {
+    OperatorType Type = 1;
+    string Data = 2;
+}
+
+// =============================================================================
+// SET OPERATIONS
+// =============================================================================
+
+enum SetOperatorType {
+    Union = 0;
+    Intersect = 1;
+    Except = 2;
+}
+
+// =============================================================================
+// JOIN TYPES
+// =============================================================================
+
+enum JoinTypeCondition {
+    INNER = 0;
+    LEFT = 1;
+    RIGHT = 2;
+    FULL = 3;
+    LEFTOUTER = 4;
+    RIGHTOUTER = 5;
+    FULLOUTER = 6;
+    IMPLICIT = 7;
+}
+
+// =============================================================================
+// VALUE TYPES
+// =============================================================================
+
+message SingleQuotedString {
+    string Value = 1;
+}
+
+message DollarQuotedString {
+    string Value = 1;
+    string Tag = 2;
+}
+
+message DoubleValue {
+    double Value = 1;
+}
+
+message LongValue {
+    int64 Value = 1;
+}
+
+message IntervalValue {
+    ArgsNode Value = 1;
+    string Unit = 2;
+}
+
+message StructValue {
+    repeated ArgsNode Values = 1;
+}
+
+message ArrayValue {
+    repeated ArgsNode Values = 1;
+    bool HasArrayPrefix = 2;
+}
+
+message TypedString {
+    string Ty = 1;
+    string Value = 2;
+}
+
+message CompoundIdent {
+    repeated string Idents = 1;
+    repeated string Except = 2;
+}
+
+// =============================================================================
+// EXPRESSIONS
+// =============================================================================
+
+message BinaryExpr {
+    ArgsNode Left = 1;
+    Operator Op = 2;
+    ArgsNode Right = 3;
+}
+
+message UnaryExpr {
+    Operator Op = 1;
+    ArgsNode Expr = 2;
+}
+
+message ConditionNode {
+    oneof ConditionNodeClause {
+        BinaryExpr BinaryItem = 1;
+        WhereNode WhereItem = 2;
+        ArgsNode ArgsItem = 3;
+    }
+}
+
+message CaseExpr {
+    ArgsNode Operand = 1;
+    repeated ConditionNode Conditions = 2;
+    repeated ArgsNode Results = 3;
+    ArgsNode ElseResult = 4;
+}
+
+message FieldAccess {
+    ArgsNode Expr = 1;
+    string Field = 2;
+}
+
+message CollateExpr {
+    ArgsNode Expr = 1;
+    string Collation = 2;
+}
+
+message RowValue {
+    repeated ArgsNode List = 1;
+}
+
+message Cast {
+    ArgsNode Expr = 1;
+    DataType DataType = 2;
+}
+
+message ArrayQueryConstructor {
+    QueryStmt Query = 1;
+}
+
+message SQLJSONFormat {
+    ArgsNode Expr = 1;
+    ArgsNode Encoding = 2;
+}
+
+// =============================================================================
+// ARGS NODE (Expression wrapper)
+// =============================================================================
+
+message ArgsNode {
+    oneof ArgsNodeClause {
+        ValueNode ValueItem = 1;
+        AggFunction FunctionItem = 2;
+        CaseExpr CaseItem = 3;
+        ArgsNode NestedItem = 4;
+        UnaryExpr UnaryItem = 5;
+        WhereNode WhereItem = 6;
+        QueryStmt QueryItem = 7;
+        Cast CastItem = 8;
+        UnnestClause UnnestItem = 9;
+        FieldAccess FieldAccessItem = 10;
+        CollateExpr CollateItem = 11;
+        RowValue RowItem = 12;
+        ArrayQueryConstructor ArrayQueryItem = 13;
+        ArrayValue ArrayItem = 14;
+        SQLJSONFormat SQLJSONFormatItem = 15;
+    }
+}
+
+// =============================================================================
+// VALUE NODE
+// =============================================================================
+
+message ValueNode {
+    oneof ValueNodeClause {
+        SingleQuotedString StringItem = 1;
+        LongValue LongItem = 2;
+        DoubleValue DoubleItem = 3;
+        NullValue NullItem = 14;
+        CompoundIdent CompoundItem = 15;
+        IntervalValue IntervalItem = 16;
+        StructValue StructItem = 17;
+        ArrayValue ArrayItem = 18;
+        TypedString TypedStringItem = 19;
+        AggFunction FunctionItem = 20;
+        bool BooleanItem = 22;
+        Cast CastItem = 23;
+        DollarQuotedString DollarItem = 24;
+    }
+}
+
+// =============================================================================
+// AGGREGATE FUNCTIONS
+// =============================================================================
+
+enum AggType {
+    UnknownAgg = 0;
+    MAX = 1;
+    MIN = 2;
+    COUNT = 3;
+    SUM = 4;
+    AVG = 5;
+    EXTRACT = 6;
+    SUBSTRING = 7;
+}
+
+message SQLJSONReturning {
+    DataType Type = 1;
+    bool FormatJson = 2;
+    string Encoding = 3;
+}
+
+enum SQLJSONBehaviorType {
+    JSON_BEHAVIOR_NULL = 0;
+    JSON_BEHAVIOR_ERROR = 1;
+    JSON_BEHAVIOR_DEFAULT = 2;
+}
+
+message SQLJSONBehavior {
+    SQLJSONBehaviorType Type = 1;
+    ArgsNode Expr = 2;
+}
+
+message PassingArg {
+    ArgsNode Expr = 1;
+    string Alias = 2;
+}
+
+message Passing {
+    repeated PassingArg Args = 1;
+}
+
+message AggFunction {
+    AggType TypeName = 1;
+    repeated ArgsNode RestArgs = 2;
+    bool Distinct = 3;
+    string Name = 4;
+    Passing Passing = 5;
+    SQLJSONReturning Returning = 6;
+    SQLJSONBehavior OnEmpty = 7;
+    SQLJSONBehavior OnError = 8;
+}
+
+// =============================================================================
+// WHERE CLAUSE
+// =============================================================================
+
+message InSubQuery {
+    ArgsNode Expr = 1;
+    QueryStmt SubQuery = 2;
+    bool Negated = 3;
+}
+
+message IsNull {
+    ArgsNode Expr = 1;
+}
+
+message IsNotNull {
+    ArgsNode Expr = 1;
+}
+
+message ExistsItem {
+    bool Negated = 1;
+    QueryStmt Query = 2;
+}
+
+message InListItem {
+    ArgsNode Expr = 1;
+    repeated ArgsNode List = 2;
+    bool Negated = 3;
+}
+
+message BetweenItem {
+    ArgsNode Expr = 1;
+    bool Negated = 2;
+    ArgsNode Low = 3;
+    ArgsNode High = 4;
+}
+
+message WhereNode {
+    oneof WhereNodeClause {
+        InSubQuery InQuery = 1;
+        BinaryExpr BinExpr = 2;
+        IsNull IsNull = 4;
+        IsNotNull IsNotNull = 5;
+        BetweenItem BetweenItem = 6;
+        InListItem InList = 7;
+        ExistsItem Exists = 8;
+        ArgsNode ArgsItem = 9;
+        UnaryExpr UnaryItem = 10;
+    }
+}
+
+// =============================================================================
+// TABLE REFERENCES
+// =============================================================================
+
+message Table {
+    ObjectName Name = 1;
+    string Alias = 2;
+    repeated ArgsNode Args = 3;
+    repeated ArgsNode WithHints = 4;
+}
+
+message JoinCondition {
+    ArgsNode SearchCondition = 1;
+}
+
+message NamedColumnsJoin {
+    repeated string ColumnList = 1;
+}
+
+message JoinSpec {
+    oneof JoinSpecClause {
+        JoinCondition JoinItem = 1;
+        NamedColumnsJoin NameItem = 2;
+    }
+}
+
+message QualifiedJoin {
+    TableReference LeftElement = 1;
+    JoinTypeCondition Type = 2;
+    TableReference RightElement = 3;
+    JoinSpec Spec = 4;
+}
+
+message NaturalJoin {
+    TableReference LeftElement = 1;
+    JoinTypeCondition Type = 2;
+    TableReference RightElement = 3;
+}
+
+message CrossJoin {
+    TableReference Left = 1;
+    TableReference Right = 2;
+}
+
+message DerivedTable {
+    bool Lateral = 1;
+    QueryStmt SubQuery = 2;
+    string Alias = 3;
+}
+
+message UnnestClause {
+    ArgsNode ArrayExpr = 1;
+    string Alias = 2;
+    bool WithOffset = 3;
+    string OffsetAlias = 4;
+}
+
+message NestedTable {
+    TableReference TableReference = 1;
+}
+
+// JSON Table support
+enum JSONBehaviorType {
+    JSON_TABLE_BEHAVIOR_ERROR = 0;
+    JSON_TABLE_BEHAVIOR_NULL = 1;
+    JSON_TABLE_BEHAVIOR_DEFAULT = 2;
+    JSON_TABLE_BEHAVIOR_EMPTY_ARRAY = 3;
+    JSON_TABLE_BEHAVIOR_EMPTY_OBJECT = 4;
+}
+
+message JSONBehavior {
+    JSONBehaviorType Type = 1;
+    ArgsNode Expr = 2;
+}
+
+message JSONColumn {
+    string Name = 1;
+    DataType DataType = 2;
+    bool Ordinality = 3;
+    string Path = 4;
+    bool Exists = 5;
+    string Format = 6;
+    string Wrapper = 7;
+    string Quotes = 8;
+    JSONBehavior OnEmpty = 9;
+    JSONBehavior OnError = 10;
+    string NestedPath = 11;
+    string NestedPathAlias = 12;
+    repeated JSONColumn NestedColumns = 13;
+}
+
+message JSONTable {
+    ArgsNode JsonExpr = 1;
+    string Path = 2;
+    repeated JSONColumn Columns = 3;
+    string Alias = 4;
+    Passing Passing = 5;
+    string PathAlias = 6;
+    ArgsNode Plan = 7;
+    JSONBehavior OnEmpty = 8;
+    JSONBehavior OnError = 9;
+}
+
+// XML Table support
+message XMLNamespaceItem {
+    bool Default = 1;
+    ArgsNode URI = 2;
+    string Alias = 3;
+}
+
+message XMLNamespaces {
+    repeated XMLNamespaceItem Items = 1;
+}
+
+message XMLColumn {
+    string Name = 1;
+    DataType DataType = 2;
+    bool ForOrdinality = 3;
+    ArgsNode Path = 4;
+    ArgsNode Default = 5;
+    bool NotNull = 6;
+}
+
+message XMLTable {
+    XMLNamespaces Namespaces = 1;
+    ArgsNode RowExpr = 2;
+    Passing Passing = 3;
+    repeated XMLColumn Columns = 4;
+    string Alias = 5;
+}
+
+message TableReference {
+    oneof TableReferenceClause {
+        Table TableItem = 1;
+        QualifiedJoin QualifiedItem = 2;
+        NaturalJoin NaturalItem = 3;
+        DerivedTable DerivedItem = 4;
+        CrossJoin CrossItem = 5;
+        UnnestClause UnnestItem = 9;
+        RowValue RowItem = 10;
+        JSONTable JSONTableItem = 11;
+        NestedTable NestedTableItem = 12;
+        XMLTable XMLTableItem = 13;
+    }
+}
+
+// =============================================================================
+// SELECT ITEMS
+// =============================================================================
+
+message QualifiedWildcardSelectItem {
+    ObjectName Prefix = 1;
+    repeated string Except = 2;
+}
+
+message AliasSelectItem {
+    ArgsNode Expr = 1;
+    string Alias = 2;
+}
+
+message SQLSelectItem {
+    oneof SQLSelectItemClause {
+        ArgsNode UnnamedItem = 1;
+        AliasSelectItem AliasItem = 2;
+        QualifiedWildcardSelectItem WildcardItem = 3;
+    }
+}
+
+// =============================================================================
+// ORDER BY / LIMIT
+// =============================================================================
+
+message OrderByExpr {
+    ArgsNode Expr = 1;
+    bool ASCBool = 2;
+}
+
+message LimitExpr {
+    bool AllBool = 1;
+    LongValue LimitValue = 2;
+    LongValue OffsetValue = 3;
+    ArgsNode LimitExpr = 4;
+    ArgsNode OffsetExpr = 5;
+}
+
+// =============================================================================
+// SELECT STATEMENT
+// =============================================================================
+
+message SQLSelect {
+    bool DistinctBool = 1;
+    repeated SQLSelectItem Projection = 2;
+    repeated TableReference FromClause = 3;
+    WhereNode WhereClause = 4;
+    repeated ArgsNode GroupByClause = 5;
+    WhereNode HavingClause = 6;
+    WhereNode QualifyClause = 7;
+    ObjectName Into = 8;
+    bool IntoTemp = 9;
+    bool IntoUnlogged = 10;
+}
+
+message SQLValues {
+    repeated RowValue Expressions = 1;
+    bool DefaultValues = 2;
+}
+
+message GenericStmt {
+    string Type = 1;
+    string Body = 2;
+}
+
+message SetOperationExpr {
+    SetOperatorType Op = 1;
+    bool All = 2;
+    SQLSetExpr Left = 3;
+    SQLSetExpr Right = 4;
+}
+
+message SQLSetExpr {
+    oneof SQLSetExprClause {
+        SQLSelect SelectItem = 1;
+        SetOperationExpr ExprItem = 2;
+        QueryStmt QueryItem = 3;
+        SQLValues ValuesItem = 4;
+        GenericStmt GenericItem = 5;
+    }
+}
+
+// =============================================================================
+// QUERY STATEMENT (Top-level SELECT)
+// =============================================================================
+
+message QueryStmt {
+    message CTE {
+        string AliasName = 1;
+        QueryStmt Query = 2;
+    }
+    repeated CTE CTEs = 2;
+    SQLSetExpr Body = 3;
+    repeated OrderByExpr OrderBy = 4;
+    LimitExpr LimitExpression = 5;
+    bool Parenthesized = 6;
+}
