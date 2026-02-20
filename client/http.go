@@ -127,6 +127,7 @@ func (h *HttpClient) RunText(ctx context.Context, text []byte, msg protoreflect.
 	if err != nil {
 		return fmt.Errorf("failed to create HTTP request: %w", err)
 	}
+	req.Header.Set("Content-Type", "text/plain")
 
 	httpClient := h.HTTPClient
 	if httpClient == nil {
